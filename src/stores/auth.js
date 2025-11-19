@@ -1,70 +1,68 @@
 import { defineStore } from 'pinia';
-import { login as apiLogin, register as apiRegister, validate, setAuthToken } from '../api/auth.js';
+import { login as loginApi, register as registerApi, validateToken } from '../api/auth';
+import { useUserStore } from './user';
+import { useChatStore } from './chat';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
     user: null,
-    initialized: false,
     loading: false,
-    error: null
+    initialized: false,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.token
+    isAuthenticated: (state) => Boolean(state.token),
   },
   actions: {
-    async initializeFromStorage() {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        this.token = storedToken;
-        setAuthToken(storedToken);
+    async initialize() {
+      if (this.initialized) return;
+      this.initialized = true;
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.token = token;
         try {
-          await this.validateToken();
-        } catch (err) {
+          await this.refreshUser();
+        } catch (error) {
           this.logout();
         }
       }
-      this.initialized = true;
+    },
+    async login(credentials) {
+      this.loading = true;
+      try {
+        const { data } = await loginApi(credentials);
+        this.setSession(data.token, data.user);
+        await useUserStore().bootstrap();
+        return data;
+      } finally {
+        this.loading = false;
+      }
     },
     async register(payload) {
       this.loading = true;
-      this.error = null;
       try {
-        await apiRegister(payload);
-      } catch (err) {
-        this.error = err.response?.data?.message || 'Registration failed';
-        throw err;
+        await registerApi(payload);
+        await this.login(payload);
       } finally {
         this.loading = false;
       }
     },
-    async login(payload) {
-      this.loading = true;
-      this.error = null;
-      try {
-        const { data } = await apiLogin(payload);
-        this.token = data.token;
-        this.user = data.user;
-        localStorage.setItem('token', data.token);
-        setAuthToken(data.token);
-      } catch (err) {
-        this.error = err.response?.data?.message || 'Login failed';
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async validateToken() {
-      if (!this.token) return;
-      const { data } = await validate();
+    async refreshUser() {
+      const { data } = await validateToken();
       this.user = data.user || data;
-      return data;
+      return this.user;
+    },
+    setSession(token, user) {
+      this.token = token;
+      this.user = user;
+      localStorage.setItem('token', token);
     },
     logout() {
       this.token = null;
       this.user = null;
       localStorage.removeItem('token');
-      setAuthToken(null);
-    }
-  }
+      useChatStore().reset();
+      useUserStore().reset();
+    },
+  },
 });

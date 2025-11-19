@@ -1,67 +1,69 @@
 import { defineStore } from 'pinia';
 import {
-  fetchMe,
-  fetchUserById,
+  getMyProfile,
+  getFriends,
+  getIncomingFriendRequests,
   sendFriendRequest,
-  fetchIncomingRequests,
   acceptFriendRequest,
   rejectFriendRequest,
-  fetchFriends
-} from '../api/users.js';
+  getUserById,
+} from '../api/users';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     profile: null,
     friends: [],
     incomingRequests: [],
-    searchResult: null,
     loading: false,
-    error: null
+    friendCache: {},
   }),
   actions: {
-    async loadProfile() {
+    async bootstrap() {
+      await Promise.all([this.fetchProfile(), this.fetchFriends(), this.fetchIncomingRequests()]);
+    },
+    async fetchProfile() {
       this.loading = true;
       try {
-        const { data } = await fetchMe();
+        const { data } = await getMyProfile();
         this.profile = data;
-        this.friends = data.friends || [];
-        this.incomingRequests = data.incoming_requests || [];
+        return data;
       } finally {
         this.loading = false;
       }
     },
-    async searchUser(id) {
-      this.loading = true;
-      this.error = null;
-      try {
-        const { data } = await fetchUserById(id);
-        this.searchResult = data;
-      } catch (err) {
-        this.searchResult = null;
-        this.error = err.response?.data?.message || 'User not found';
-      } finally {
-        this.loading = false;
-      }
-    },
-    async sendRequest(to_user_id) {
-      await sendFriendRequest({ to_user_id });
-    },
-    async refreshRequests() {
-      const { data } = await fetchIncomingRequests();
-      this.incomingRequests = data;
-    },
-    async acceptRequest(id) {
-      await acceptFriendRequest(id);
-      await this.refreshRequests();
-      await this.loadFriends();
-    },
-    async rejectRequest(id) {
-      await rejectFriendRequest(id);
-      await this.refreshRequests();
-    },
-    async loadFriends() {
-      const { data } = await fetchFriends();
+    async fetchFriends() {
+      const { data } = await getFriends();
       this.friends = data;
-    }
-  }
+      return data;
+    },
+    async fetchIncomingRequests() {
+      const { data } = await getIncomingFriendRequests();
+      this.incomingRequests = data;
+      return data;
+    },
+    async requestFriend(toUserId) {
+      if (!toUserId) return;
+      await sendFriendRequest({ to_user_id: Number(toUserId) });
+      await this.fetchIncomingRequests();
+    },
+    async respondToRequest(id, decision) {
+      if (decision === 'accept') {
+        await acceptFriendRequest(id);
+      } else {
+        await rejectFriendRequest(id);
+      }
+      await Promise.all([this.fetchFriends(), this.fetchIncomingRequests()]);
+    },
+    async ensureUserCached(userId) {
+      if (!userId) return null;
+      if (!this.friendCache[userId]) {
+        const { data } = await getUserById(userId);
+        this.friendCache[userId] = data;
+      }
+      return this.friendCache[userId];
+    },
+    reset() {
+      this.$reset();
+    },
+  },
 });

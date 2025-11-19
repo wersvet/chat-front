@@ -1,43 +1,64 @@
 <template>
-  <div class="card">
-    <div class="space-between">
-      <h3>Your Friends</h3>
-      <button @click="reload" :disabled="loading">Refresh</button>
-    </div>
-    <ul class="list" v-if="friends.length">
-      <li v-for="friend in friends" :key="friend.id" class="space-between">
-        <div>
-          <div><strong>{{ friend.username }}</strong></div>
-          <div class="muted">ID: {{ friend.id }}</div>
-        </div>
-        <div>
-          <slot name="actions" :friend="friend"></slot>
-        </div>
+  <section class="card">
+    <header>
+      <h3>Друзья ({{ friends.length }})</h3>
+    </header>
+    <ul>
+      <li v-for="friend in friends" :key="friend.id">
+        <span>{{ friend.username }}</span>
+        <slot name="actions" :friend="friend"></slot>
       </li>
     </ul>
-    <p v-else class="muted">No friends yet.</p>
-  </div>
+    <p v-if="!friends.length" class="card__empty">No friends yet. Send a request!</p>
+  </section>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { useUserStore } from '../stores/user.js';
-
-const userStore = useUserStore();
-const friends = computed(() => userStore.friends);
-const loading = computed(() => userStore.loading);
-
-const reload = async () => {
-  await userStore.loadFriends();
-};
-
-onMounted(() => {
-  reload();
+const props = defineProps({
+  friends: { type: Array, default: () => [] },
 });
 </script>
 
 <style scoped>
-.muted {
-  color: #6b7280;
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.card li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.card li:last-child {
+  border-bottom: none;
+}
+
+.card__empty {
+  text-align: center;
+  color: var(--muted);
+  margin: 0;
 }
 </style>

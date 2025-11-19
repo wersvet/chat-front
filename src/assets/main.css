@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    color-scheme: light;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #dce5f5;
+    color: #1f2d3d;
+    --sidebar-bg: rgba(255, 255, 255, 0.9);
+    --smart-left-panel: #696868;
+    --panel-bg: rgba(255, 255, 255, 0.8);
+    --primary: #006bff;
+    --primary-dark: #0045b0;
+    --border-color: rgba(31, 45, 61, 0.08);
+    --muted: #6c7a91;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #d3e2ff, #f9fcff 45%, #dbe9ff);
+}
+
+#app {
+    min-height: 100vh;
+}
+
+.app-shell {
+    min-height: 100vh;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+input,
+button,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}

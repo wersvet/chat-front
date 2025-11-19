@@ -1,18 +1,8 @@
-import axios from 'axios';
+import { createApiClient } from './http';
 
-const client = axios.create({
-  baseURL: 'http://localhost:8081',
-  headers: { 'Content-Type': 'application/json' }
-});
+const authClient = createApiClient('http://localhost:8081');
 
-export const setAuthToken = (token) => {
-  if (token) {
-    client.defaults.headers.common.Authorization = `Bearer ${token}`;
-  } else {
-    delete client.defaults.headers.common.Authorization;
-  }
-};
-
-export const register = (payload) => client.post('/auth/register', payload);
-export const login = (payload) => client.post('/auth/login', payload);
-export const validate = () => client.get('/auth/validate');
+export const register = (payload) => authClient.post('/auth/register', payload);
+export const login = (payload) => authClient.post('/auth/login', payload);
+export const validateToken = () => authClient.get('/auth/validate');
+export const fetchAuthUserById = (id) => authClient.get(`/auth/user/${id}`);
