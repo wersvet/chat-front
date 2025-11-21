@@ -59,7 +59,7 @@ export const useChatStore = defineStore('chat', {
         chat_id: chat.chat_id || chat.id,
         friend_id: chat.friend_id,
         created_at: chat.created_at,
-        my_id: authStore.user?.id,          // <--- ВАЖНО!
+        my_id: authStore.user?.id,
         last_message: null
       };
 

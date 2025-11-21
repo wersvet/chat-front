@@ -13,6 +13,6 @@ app.use(router);
 
 // bootstrap auth before mounting the app
 const authStore = useAuthStore(pinia);
-authStore.initialize();
+await authStore.initialize();
 
 app.mount('#app');

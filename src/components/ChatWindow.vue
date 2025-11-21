@@ -12,7 +12,7 @@
         v-for="message in messages"
         :key="message.id"
         :message="message"
-        :is-mine="message.sender_id === chat?.my_id"
+        :is-mine="message.sender_id == currentUserId"
         @delete-for-me="emit('delete-for-me', message.id)"
         @delete-for-all="emit('delete-for-all', message.id)"
       />
@@ -42,7 +42,7 @@ import MessageBubble from './MessageBubble.vue';
 const props = defineProps({
   chat: { type: Object, default: null },
   messages: { type: Array, default: () => [] },
-  currentUserId: { type: [Number, String], default: null },
+  currentUserId: { type: Number, required: true },
 });
 
 const emit = defineEmits(['send', 'delete-for-me', 'delete-for-all', 'hide-chat']);

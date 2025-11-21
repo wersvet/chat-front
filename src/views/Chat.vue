@@ -68,6 +68,7 @@ const chatStore = useChatStore();
 const chatSearch = ref('');
 
 onMounted(async () => {
+
   await userStore.bootstrap();
   await chatStore.loadChats();
 
