@@ -1,6 +1,6 @@
 import { createApiClient } from './http';
 
-const chatClient = createApiClient('http://localhost:8083');
+const chatClient = createApiClient('http://localhost:9000');
 
 export const listChats = () => chatClient.get('/chats');
 export const startChat = (payload) => chatClient.post('/chats/start', payload);

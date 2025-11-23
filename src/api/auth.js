@@ -1,6 +1,6 @@
 import { createApiClient } from './http';
 
-const authClient = createApiClient('http://localhost:8081');
+const authClient = createApiClient('http://localhost:9000');
 
 export const register = (payload) => authClient.post('/auth/register', payload);
 export const login = (payload) => authClient.post('/auth/login', payload);

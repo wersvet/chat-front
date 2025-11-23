@@ -1,6 +1,6 @@
 import { createApiClient } from './http';
 
-const userClient = createApiClient('http://localhost:8082');
+const userClient = createApiClient('http://localhost:9000');
 
 export const getMyProfile = () => userClient.get('/users/me');
 export const getUserById = (id) => userClient.get(`/users/${id}`);

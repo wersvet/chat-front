@@ -172,7 +172,7 @@ export const useChatStore = defineStore('chat', {
       const token = localStorage.getItem('token');
       if (!token) return;
       this.disconnectSocket(chatId);
-      const ws = new WebSocket(`ws://localhost:8083/ws/chats/${chatId}?token=${token}`);
+      const ws = new WebSocket(`ws://localhost:9000/ws/chats/${chatId}?token=${token}`)
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
