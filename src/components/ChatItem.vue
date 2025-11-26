@@ -1,9 +1,12 @@
 <template>
-<article class="chat-item" :class="{ 'chat-item--active': active }" @click="emit('select')">
+  <article class="chat-item" :class="{ 'chat-item--active': active }" @click="emit('select')">
     <div class="chat-item__avatar">{{ initials }}</div>
     <div class="chat-item__content">
       <header>
-        <h3>{{ chat.friend?.username || 'Unknown user' }}</h3>
+        <div class="chat-item__title">
+          <h3>{{ displayName }}</h3>
+          <span v-if="chat.type === 'group'" class="badge">Group</span>
+        </div>
         <small>{{ lastMessageTime }}</small>
       </header>
       <p class="chat-item__preview">{{ lastMessagePreview }}</p>
@@ -21,19 +24,14 @@ const props = defineProps({
 
 const emit = defineEmits(['select']);
 
-const initials = computed(() => props.chat.friend?.username?.slice(0, 2)?.toUpperCase() || '??');
+const displayName = computed(() => props.chat.name || props.chat.friend?.username || 'Unknown');
+
+const initials = computed(() => displayName.value?.slice(0, 2)?.toUpperCase() || '??');
 
 const lastMessagePreview = computed(() => {
-  const msg = props.chat.last_message;
-  if (!msg) return 'No messages yet';
-
-  const isMine = msg.sender_id === props.chat.my_id; // my_id мы добавим
-  const prefix = isMine ? 'Вы: ' : '';
-
-  const content = msg.content || '';
-  const text = content.length > 32 ? `${content.slice(0, 32)}…` : content;
-
-  return prefix + text;
+  const content = props.chat.last_message?.content;
+  if (!content) return 'No messages yet';
+  return content.length > 32 ? `${content.slice(0, 32)}…` : content;
 });
 
 const lastMessageTime = computed(() => {
@@ -79,6 +77,12 @@ const lastMessageTime = computed(() => {
   flex: 1;
 }
 
+.chat-item__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .chat-item__content header {
   display: flex;
   justify-content: space-between;
@@ -90,6 +94,15 @@ const lastMessageTime = computed(() => {
   margin: 0;
   font-size: 0.95rem;
   color: #1f2d3d;
+}
+
+.badge {
+  background: rgba(0, 107, 255, 0.15);
+  color: #0b4dc2;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .chat-item__preview {

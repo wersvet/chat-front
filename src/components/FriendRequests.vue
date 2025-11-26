@@ -1,7 +1,7 @@
 <template>
   <section class="card">
     <header>
-      <h3>Входящие запросы ({{ requests.length }})</h3>
+      <h3>Incoming requests ({{ requests.length }})</h3>
     </header>
     <ul>
       <li v-for="request in requests" :key="request.id">
@@ -10,12 +10,12 @@
           <p>User ID {{ request.from_user_id }}</p>
         </div>
         <div class="card__actions">
-          <button @click="emit('accept', request.id)">Принять</button>
-          <button class="danger" @click="emit('reject', request.id)">Отклонить</button>
+          <button @click="emit('accept', request.id)">Accept</button>
+          <button class="danger" @click="emit('reject', request.id)">Reject</button>
         </div>
       </li>
     </ul>
-    <p v-if="!requests.length" class="card__empty">Нет входящих запросов</p>
+    <p v-if="!requests.length" class="card__empty">No incoming requests</p>
   </section>
 </template>
 

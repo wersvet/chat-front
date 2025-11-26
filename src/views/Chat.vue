@@ -3,87 +3,166 @@
     <aside class="chat-layout__sidebar">
       <div class="sidebar-header">
         <div>
-          <p class="sidebar-subtitle">Вы вошли как:</p>
+          <p class="sidebar-subtitle">Logged in as</p>
           <h2>{{ userStore.profile?.username }}</h2>
         </div>
-        <button class="ghost" @click="handleLogout">Выйти</button>
+        <button class="ghost" @click="handleLogout">Logout</button>
       </div>
       <div class="sidebar-forms">
         <AddFriend @submit="handleFriendRequest" />
-        <CreateChat @submit="handleCreateChat" />
+        <CreateGroup :friends="userStore.friends" @submit="handleCreateGroup" />
       </div>
       <ChatList
-        :chats="chatStore.chats"
-        :selected-id="chatStore.activeChatId"
-        :loading="chatStore.loadingChats"
-        v-model:search="chatSearch"
-        @select="chatStore.selectChat"
+          :chats="chatsForList"
+          :selected-key="selectedKey"
+          :loading="chatStore.loadingChats"
+          v-model:search="chatSearch"
+          @select="handleSelectChat"
       />
       <div class="sidebar-cards">
         <FriendList :friends="userStore.friends">
           <template #actions="{ friend }">
             <button class="ghost" @click="chatStore.startChatWithFriend(friend.id)">
-              Сообщение
+              Message
             </button>
           </template>
         </FriendList>
         <FriendRequests
-          :requests="userStore.incomingRequests"
-          @accept="(id) => userStore.respondToRequest(id, 'accept')"
-          @reject="(id) => userStore.respondToRequest(id, 'reject')"
+            :requests="userStore.incomingRequests"
+            @accept="(id) => userStore.respondToRequest(id, 'accept')"
+            @reject="(id) => userStore.respondToRequest(id, 'reject')"
         />
       </div>
     </aside>
     <main class="chat-layout__content">
       <ChatWindow
-        :chat="chatStore.activeChat"
-        :messages="chatStore.activeMessages"
-        :current-user-id="authStore.user?.id"
-        @send="(message) => chatStore.sendMessage(chatStore.activeChatId, message)"
-        @delete-for-me="(messageId) => chatStore.deleteForMe(chatStore.activeChatId, messageId)"
-        @delete-for-all="(messageId) => chatStore.deleteForAll(chatStore.activeChatId, messageId)"
-        @hide-chat="chatStore.hideChat"
+          v-if="isReady"
+          :chat="activeChat"
+          :messages="activeMessages"
+          :current-user-id="authStore.user?.id"
+          :type="activeType || 'private'"
+          @send="handleSend"
+          @delete-for-me="handleDeleteForMe"
+          @delete-for-all="handleDeleteForAll"
+          @hide-chat="chatStore.hideChat"
       />
+      <div v-else class="chat-layout__loading">
+        <p>Loading your account...</p>
+      </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useUserStore } from '../stores/user';
 import { useChatStore } from '../stores/chat';
+import { useGroupStore } from '../stores/group';
 import ChatList from '../components/ChatList.vue';
 import ChatWindow from '../components/ChatWindow.vue';
 import FriendList from '../components/FriendList.vue';
 import FriendRequests from '../components/FriendRequests.vue';
 import AddFriend from '../components/AddFriend.vue';
-import CreateChat from '../components/CreateChat.vue';
+import CreateGroup from '../components/CreateGroup.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const chatStore = useChatStore();
+const groupStore = useGroupStore();
 const chatSearch = ref('');
+const isReady = computed(() => Boolean(authStore.user?.id));
+const sortByLastActivity = (items) =>
+    [...items].sort((a, b) => {
+      const aTime = new Date(a?.last_message?.created_at || a.updated_at || 0).getTime();
+      const bTime = new Date(b?.last_message?.created_at || b.updated_at || 0).getTime();
+      return bTime - aTime;
+    });
+const selectedKey = computed(() => {
+  if (chatStore.activeChatId) return `private-${chatStore.activeChatId}`;
+  if (groupStore.activeGroupId) return `group-${groupStore.activeGroupId}`;
+  return null;
+});
+
+const chatsForList = computed(() => {
+  const privateChats = chatStore.chats.map((chat) => ({
+    ...chat,
+    type: 'private',
+    name: chat.friend?.username || chat.name,
+  }));
+
+  const groups = groupStore.groups.map((group) => ({
+    ...group,
+    type: 'group',
+  }));
+
+  return sortByLastActivity([...privateChats, ...groups]);
+});
 
 onMounted(async () => {
+  await authStore.initialize();
+  if (!authStore.user) {
+    try {
+      await authStore.refreshUser();
+    } catch (error) {
+      authStore.logout();
+      return;
+    }
+  }
 
   await userStore.bootstrap();
   await chatStore.loadChats();
-
-  // <--- если есть чаты, выбираем первый
-  if (chatStore.chats.length > 0) {
-    chatStore.selectChat(chatStore.chats[0].id);
-  }
+  await groupStore.loadGroups();
 });
 
 const handleFriendRequest = async (userId) => {
   await userStore.requestFriend(userId);
 };
 
-const handleCreateChat = async (userId) => {
-  await chatStore.startChatWithFriend(userId);
+const handleCreateGroup = async (payload) => {
+  await groupStore.createGroup(payload);
+  await groupStore.loadGroups();
+};
+
+const handleSelectChat = async (chat) => {
+  if (!chat) return;
+  if (chat.type === 'group') {
+    chatStore.activeChatId = null;
+    await groupStore.selectGroup(chat.id);
+  } else {
+    groupStore.activeGroupId = null;
+    await chatStore.selectChat(chat.id);
+  }
+};
+
+const activeChat = computed(() => (groupStore.activeGroup ? groupStore.activeGroup : chatStore.activeChat));
+const activeMessages = computed(() =>
+    groupStore.activeGroupId ? groupStore.activeMessages : chatStore.activeMessages,
+);
+const activeType = computed(() => (groupStore.activeGroupId ? 'group' : chatStore.activeChatId ? 'private' : null));
+
+const handleSend = async (message) => {
+  if (activeType.value === 'group') {
+    await groupStore.sendMessage(groupStore.activeGroupId, message);
+  } else if (chatStore.activeChatId) {
+    await chatStore.sendMessage(chatStore.activeChatId, message);
+  }
+};
+
+const handleDeleteForMe = async (messageId) => {
+  if (activeType.value === 'private' && chatStore.activeChatId) {
+    await chatStore.deleteForMe(chatStore.activeChatId, messageId);
+  }
+};
+
+const handleDeleteForAll = async (messageId) => {
+  if (activeType.value === 'group' && groupStore.activeGroupId) {
+    await groupStore.deleteMessageForAll(groupStore.activeGroupId, messageId);
+  } else if (chatStore.activeChatId) {
+    await chatStore.deleteForAll(chatStore.activeChatId, messageId);
+  }
 };
 
 const handleLogout = () => {
@@ -109,6 +188,16 @@ const handleLogout = () => {
 
 .chat-layout__content {
   min-height: 80vh;
+}
+
+.chat-layout__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--muted);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
 }
 
 .sidebar-header {

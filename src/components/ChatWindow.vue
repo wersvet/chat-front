@@ -2,58 +2,73 @@
   <section class="chat-window" v-if="chat">
     <header class="chat-window__header">
       <div>
-        <h2>{{ chat.friend?.username }}</h2>
-        <p>ID чата: {{ chat.id }}</p>
+        <h2>{{ title }}</h2>
+        <p>Chat ID: {{ chat.id }}</p>
       </div>
-      <button class="ghost" @click="emit('hide-chat', chat.id)">Скрыть чат</button>
+      <button v-if="type === 'private'" class="ghost" @click="emit('hide-chat', chat.id)">Hide chat</button>
     </header>
     <div class="chat-window__messages" ref="messagesContainer">
       <MessageBubble
-        v-for="message in messages"
-        :key="message.id"
-        :message="message"
-        :is-mine="message.sender_id == currentUserId"
-        @delete-for-me="emit('delete-for-me', message.id)"
-        @delete-for-all="emit('delete-for-all', message.id)"
+          v-for="message in messages"
+          :key="message.id"
+          :message="message"
+          :is-mine="isMine(message)"
+          :show-delete-for-me="type === 'private'"
+          @delete-for-me="emit('delete-for-me', message.id)"
+          @delete-for-all="emit('delete-for-all', message.id)"
       />
     </div>
     <footer class="chat-window__composer">
       <textarea
-        v-model="draft"
-        placeholder="Введите сообщение"
-        rows="1"
-        @keydown.enter.prevent="handleSend"
+          v-model="draft"
+          placeholder="Type a message"
+          rows="1"
+          @keydown.enter.prevent="handleSend"
       ></textarea>
-      <button class="primary" :disabled="!draft.trim()" @click="handleSend">Отправить</button>
+      <button class="primary" :disabled="!draft.trim()" @click="handleSend">Send</button>
     </footer>
   </section>
   <section v-else class="chat-window chat-window--placeholder">
     <div>
-      <h2>Выберите разговор</h2>
-      <p>Выберите чат, чтобы начать переписку. Новые разговоры появляются здесь мгновенно</p>
+      <h2>Select a conversation</h2>
+      <p>Choose a chat to begin messaging. New conversations appear here instantly.</p>
     </div>
   </section>
 </template>
 
 <script setup>
-import { nextTick, onUpdated, ref, watch } from 'vue';
+import { computed, nextTick, onUpdated, ref, watch } from 'vue';
 import MessageBubble from './MessageBubble.vue';
 
 const props = defineProps({
   chat: { type: Object, default: null },
   messages: { type: Array, default: () => [] },
-  currentUserId: { type: Number, required: true },
+  currentUserId: { type: [Number, String], default: null },
+  type: { type: String, default: 'private' },
 });
 
 const emit = defineEmits(['send', 'delete-for-me', 'delete-for-all', 'hide-chat']);
 
 const draft = ref('');
 const messagesContainer = ref(null);
+const title = computed(() => props.chat?.name || props.chat?.friend?.username || '');
+const normalizedUserId = computed(() =>
+    props.currentUserId !== null && props.currentUserId !== undefined
+        ? Number(props.currentUserId)
+        : null,
+);
 
 const handleSend = () => {
   if (!draft.value.trim()) return;
   emit('send', draft.value.trim());
   draft.value = '';
+};
+
+const isMine = (message) => {
+  const userId = normalizedUserId.value;
+  if (userId === null) return false;
+  const senderId = message?.sender_id !== undefined && message?.sender_id !== null ? Number(message.sender_id) : null;
+  return senderId !== null && senderId === userId;
 };
 
 const scrollToBottom = () => {
@@ -65,8 +80,8 @@ const scrollToBottom = () => {
 };
 
 watch(
-  () => props.messages.length,
-  () => scrollToBottom(),
+    () => props.messages.length,
+    () => scrollToBottom(),
 );
 
 onUpdated(scrollToBottom);
@@ -76,22 +91,12 @@ onUpdated(scrollToBottom);
 .chat-window {
   background: var(--panel-bg);
   border-radius: 24px;
-  height: calc(100vh - 40px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(31, 45, 61, 0.08);
 }
-
-.chat-window__messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.25rem 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
 
 .chat-window--placeholder {
   align-items: center;
@@ -116,6 +121,15 @@ onUpdated(scrollToBottom);
   margin: 0.2rem 0 0;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.chat-window__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .chat-window__composer {

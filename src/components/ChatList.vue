@@ -1,26 +1,26 @@
 <template>
   <div class="chat-list">
     <div class="chat-list__header">
-      <h2>Чаты</h2>
+      <h2>Chats</h2>
       <span class="chat-list__counter">{{ chats.length }}</span>
     </div>
     <div class="chat-list__search">
       <input
-        v-model="localSearch"
-        type="text"
-        placeholder="Поиск по имени пользователя"
+          v-model="localSearch"
+          type="text"
+          placeholder="Search by username"
       />
     </div>
     <div class="chat-list__body" v-if="!loading">
       <ChatItem
-        v-for="chat in filteredChats"
-        :key="chat.id"
-        :chat="chat"
-        :active="chat.id === selectedId"
-        @select="emit('select', chat.id)"
+          v-for="chat in filteredChats"
+          :key="chatKey(chat)"
+          :chat="chat"
+          :active="chatKey(chat) === selectedKey"
+          @select="emit('select', chat)"
       />
       <p v-if="!filteredChats.length" class="chat-list__empty">
-        Чат не найден. Начать новый диалог
+        No chats found. Start a new conversation!
       </p>
     </div>
     <div v-else class="chat-list__loading">Loading chats...</div>
@@ -33,7 +33,7 @@ import ChatItem from './ChatItem.vue';
 
 const props = defineProps({
   chats: { type: Array, default: () => [] },
-  selectedId: { type: [Number, String], default: null },
+  selectedKey: { type: [Number, String], default: null },
   search: { type: String, default: '' },
   loading: { type: Boolean, default: false },
 });
@@ -43,12 +43,12 @@ const emit = defineEmits(['update:search', 'select']);
 const localSearch = ref(props.search);
 
 watch(
-  () => props.search,
-  (value) => {
-    if (value !== localSearch.value) {
-      localSearch.value = value;
-    }
-  },
+    () => props.search,
+    (value) => {
+      if (value !== localSearch.value) {
+        localSearch.value = value;
+      }
+    },
 );
 
 watch(localSearch, (value) => emit('update:search', value));
@@ -58,8 +58,14 @@ const filteredChats = computed(() => {
     return props.chats;
   }
   const term = localSearch.value.toLowerCase();
-  return props.chats.filter((chat) => chat.friend?.username?.toLowerCase().includes(term));
+  return props.chats.filter((chat) => {
+    const friendName = chat.friend?.username?.toLowerCase() || '';
+    const chatName = chat.name?.toLowerCase() || '';
+    return friendName.includes(term) || chatName.includes(term);
+  });
 });
+
+const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
 </script>
 
 <style scoped>

@@ -1,17 +1,17 @@
 <template>
   <section class="card">
     <header>
-      <h3>Начать новый чат</h3>
+      <h3>Start new chat</h3>
     </header>
     <form @submit.prevent="handleSubmit" class="stack">
       <input
-        v-model="friendId"
-        type="number"
-        min="1"
-        placeholder="ID пользователя"
-        required
+          v-model="friendId"
+          type="number"
+          min="1"
+          placeholder="Friend user ID"
+          required
       />
-      <button type="submit">Создать чат</button>
+      <button type="submit">Create chat</button>
     </form>
   </section>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <section class="card">
     <header>
-      <h3>Друзья ({{ friends.length }})</h3>
+      <h3>Friends ({{ friends.length }})</h3>
     </header>
     <ul>
       <li v-for="friend in friends" :key="friend.id">
