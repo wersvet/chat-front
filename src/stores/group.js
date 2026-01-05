@@ -10,6 +10,17 @@ import {
 const sortMessages = (messages = []) =>
     [...messages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
+const normalizeGroup = (raw) => {
+    if (!raw) return null;
+    const id = raw.id ?? raw.group_id ?? raw.groupId;
+    return {
+        ...raw,
+        id,
+        type: 'group',
+        name: raw.name ?? raw.title ?? '',
+    };
+};
+
 export const useGroupStore = defineStore('group', {
     state: () => ({
         groups: [],
@@ -26,7 +37,8 @@ export const useGroupStore = defineStore('group', {
     actions: {
         async loadGroups() {
             const { data } = await listGroups();
-            this.groups = data || [];
+            const rawGroups = data?.groups ?? data ?? [];
+            this.groups = rawGroups.map(normalizeGroup).filter(Boolean);
         },
         async selectGroup(id) {
             if (!id) return;
@@ -39,7 +51,8 @@ export const useGroupStore = defineStore('group', {
         },
         async loadGroupMessages(id) {
             const { data } = await getGroupMessages(id);
-            this.activeMessages = sortMessages(data || []);
+            const messages = Array.isArray(data) ? data : data?.messages ?? [];
+            this.activeMessages = sortMessages(messages);
         },
         async createGroup(payload) {
             await createGroupApi(payload);

@@ -5,9 +5,9 @@
       <footer>
         <small>{{ time }}</small>
         <div class="message-bubble__actions">
-          <button v-if="showDeleteForMe" @click.stop="emit('delete-for-me')">Delete for me</button>
+          <button v-if="showDeleteForMe" @click.stop="emit('delete-for-me')">удалить у себя</button>
           <button v-if="isMine && !message.deletedForEveryone" @click.stop="emit('delete-for-all')">
-            Delete for everyone
+            удалить у всех
           </button>
         </div>
       </footer>

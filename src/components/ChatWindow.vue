@@ -5,7 +5,7 @@
         <h2>{{ title }}</h2>
         <p>Chat ID: {{ chat.id }}</p>
       </div>
-      <button v-if="type === 'private'" class="ghost" @click="emit('hide-chat', chat.id)">Hide chat</button>
+      <button v-if="type === 'private'" class="ghost" @click="emit('hide-chat', chat.id)">Скрыть чат</button>
     </header>
     <div class="chat-window__messages" ref="messagesContainer">
       <MessageBubble
@@ -21,17 +21,17 @@
     <footer class="chat-window__composer">
       <textarea
           v-model="draft"
-          placeholder="Type a message"
+          placeholder="Сообщение..."
           rows="1"
           @keydown.enter.prevent="handleSend"
       ></textarea>
-      <button class="primary" :disabled="!draft.trim()" @click="handleSend">Send</button>
+      <button class="primary" :disabled="!draft.trim()" @click="handleSend">Отправить</button>
     </footer>
   </section>
   <section v-else class="chat-window chat-window--placeholder">
     <div>
-      <h2>Select a conversation</h2>
-      <p>Choose a chat to begin messaging. New conversations appear here instantly.</p>
+      <h2>Начните чат</h2>
+      <p>Выберите, кому хотели бы написать</p>
     </div>
   </section>
 </template>

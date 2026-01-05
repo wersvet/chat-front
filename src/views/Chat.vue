@@ -3,10 +3,10 @@
     <aside class="chat-layout__sidebar">
       <div class="sidebar-header">
         <div>
-          <p class="sidebar-subtitle">Logged in as</p>
+          <p class="sidebar-subtitle">Вы</p>
           <h2>{{ userStore.profile?.username }}</h2>
         </div>
-        <button class="ghost" @click="handleLogout">Logout</button>
+        <button class="ghost" @click="handleLogout">Выйти</button>
       </div>
       <div class="sidebar-forms">
         <AddFriend @submit="handleFriendRequest" />
@@ -23,7 +23,7 @@
         <FriendList :friends="userStore.friends">
           <template #actions="{ friend }">
             <button class="ghost" @click="chatStore.startChatWithFriend(friend.id)">
-              Message
+              открыть чат
             </button>
           </template>
         </FriendList>

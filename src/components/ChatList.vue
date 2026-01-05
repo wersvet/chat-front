@@ -1,14 +1,14 @@
 <template>
   <div class="chat-list">
     <div class="chat-list__header">
-      <h2>Chats</h2>
+      <h2>чаты</h2>
       <span class="chat-list__counter">{{ chats.length }}</span>
     </div>
     <div class="chat-list__search">
       <input
           v-model="localSearch"
           type="text"
-          placeholder="Search by username"
+          placeholder="Поиск"
       />
     </div>
     <div class="chat-list__body" v-if="!loading">

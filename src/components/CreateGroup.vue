@@ -4,7 +4,7 @@
       <h3>Создать группу</h3>
     </header>
     <form @submit.prevent="handleSubmit" class="stack">
-      <input v-model="name" type="text" placeholder="Group name" required />
+      <input v-model="name" type="text" placeholder="Название группы" required />
       <div class="friends-list">
         <label v-for="friend in friends" :key="friend.id" class="friend-row">
           <input

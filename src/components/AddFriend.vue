@@ -1,17 +1,17 @@
 <template>
   <section class="card">
     <header>
-      <h3>Add friend</h3>
+      <h3>Добавить друга</h3>
     </header>
     <form @submit.prevent="handleSubmit" class="stack">
       <input
           v-model="friendId"
           type="number"
           min="1"
-          placeholder="Enter user ID"
+          placeholder="введите id друга"
           required
       />
-      <button class="primary" type="submit">Send request</button>
+      <button class="primary" type="submit">Отправить запрос</button>
     </form>
   </section>
 </template>

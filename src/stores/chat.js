@@ -17,6 +17,23 @@ const sortByLastMessage = (chats) =>
         return bTime - aTime;
     });
 
+const normalizeChat = (raw) => {
+    if (!raw) return null;
+    const type = raw.type || 'private';
+    const id = raw.id ?? raw.chat_id ?? raw.chatId ?? raw.group_id ?? raw.groupId;
+    const friend = raw.friend || null;
+    const friendId = raw.friend_id ?? raw.friendId ?? friend?.id ?? null;
+
+    return {
+        ...raw,
+        id,
+        type,
+        friend,
+        friend_id: friendId,
+        name: raw.name ?? (type === 'private' ? friend?.username : raw.name) ?? '',
+    };
+};
+
 export const useChatStore = defineStore('chat', {
     state: () => ({
         chats: [],
@@ -40,7 +57,10 @@ export const useChatStore = defineStore('chat', {
             this.loadingChats = true;
             try {
                 const { data } = await listChats();
-                const enriched = await Promise.all(data.map((chat) => this.enrichChat(chat)));
+                const rawChats = data?.chats ?? data ?? [];
+                const normalized = rawChats.map(normalizeChat).filter(Boolean);
+                const privateChats = normalized.filter((chat) => (chat.type || 'private') === 'private');
+                const enriched = await Promise.all(privateChats.map((chat) => this.enrichChat(chat)));
                 this.chats = sortByLastMessage(enriched);
             } finally {
                 this.loadingChats = false;
@@ -48,7 +68,7 @@ export const useChatStore = defineStore('chat', {
         },
         async enrichChat(chat) {
             if (!chat) return chat;
-            const friendId = chat.friend_id || chat.friendId;
+            const friendId = chat.friend?.id || chat.friend_id || chat.friendId;
             if (friendId && !chat.friend) {
                 const friend = await useUserStore().ensureUserCached(friendId);
                 return { ...chat, friend };
@@ -65,13 +85,15 @@ export const useChatStore = defineStore('chat', {
         },
         async fetchMessages(chatId) {
             const { data } = await fetchMessages(chatId);
-            const ordered = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            const messages = Array.isArray(data) ? data : data?.messages ?? [];
+            const ordered = [...messages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             this.messages = { ...this.messages, [chatId]: ordered };
         },
         async startChatWithFriend(friendId) {
             if (!friendId) return null;
             const { data } = await startChat({ friend_id: Number(friendId) });
-            const chat = await this.enrichChat(data);
+            const normalized = normalizeChat(data?.chat ?? data);
+            const chat = await this.enrichChat(normalized);
             const existingIndex = this.chats.findIndex((c) => c.id === chat.id);
             if (existingIndex > -1) {
                 this.chats.splice(existingIndex, 1, chat);

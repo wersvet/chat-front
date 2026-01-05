@@ -1,7 +1,7 @@
 <template>
   <section class="card">
     <header>
-      <h3>Incoming requests ({{ requests.length }})</h3>
+      <h3>Входящие запросы ({{ requests.length }})</h3>
     </header>
     <ul>
       <li v-for="request in requests" :key="request.id">
@@ -15,7 +15,7 @@
         </div>
       </li>
     </ul>
-    <p v-if="!requests.length" class="card__empty">No incoming requests</p>
+    <p v-if="!requests.length" class="card__empty">Нет входящих запросов</p>
   </section>
 </template>
 
