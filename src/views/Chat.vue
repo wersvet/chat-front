@@ -16,10 +16,6 @@
           </div>
         </header>
 
-        <section class="sidebar-forms">
-          <AddFriend class="soft-card" @submit="handleFriendRequest" />
-          <CreateGroup class="soft-card" :friends="userStore.friends" @submit="handleCreateGroup" />
-        </section>
 
         <section class="sidebar-list glass-card">
           <ChatList
@@ -30,6 +26,11 @@
               @select="handleSelectChat"
           />
         </section>
+
+          <section class="sidebar-forms">
+            <AddFriend class="soft-card" @submit="handleFriendRequest" />
+            <CreateGroup class="soft-card" :friends="userStore.friends" @submit="handleCreateGroup" />
+          </section>
 
         <div class="sidebar-cards">
           <FriendList class="soft-card" :friends="userStore.friends">
@@ -281,16 +282,26 @@ const handleLogout = () => {
 }
 
 .sidebar-forms {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+}
+
+.sidebar-forms :deep(.soft-card) {
+  padding: 0.75rem;         /* было больше */
+}
+
+.sidebar-forms :deep(input),
+.sidebar-forms :deep(button),
+.sidebar-forms :deep(select),
+.sidebar-forms :deep(textarea) {
+  height: 34px;             /* уменьшить контролы */
+  font-size: 0.9rem;
 }
 
 .sidebar-list {
-  padding: 0.35rem 0.35rem 0.25rem;
-  flex: 1;
+  flex: 1 1 auto;         /* вместо просто flex:1 */
   min-height: 0;
   display: flex;
+  overflow: hidden;       /* важно: скролл внутри ChatList */
 }
 
 .sidebar-list > * {
@@ -302,9 +313,13 @@ const handleLogout = () => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: auto;
+  margin-top: 0;          /* убрать авто-выталкивание */
   padding-top: 0.25rem;
-  overflow: auto;
+
+  flex: 0 0 auto;         /* не растягиваться */
+  max-height: 260px;      /* ограничить высоту блока друзей/запросов */
+  overflow-y: auto;       /* если много друзей — скролл тут, а не в ChatList */
+  min-height: 0;
 }
 
 @media (max-width: 1280px) {

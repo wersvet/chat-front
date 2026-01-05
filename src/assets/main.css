@@ -27,7 +27,7 @@ body {
     background-color: var(--bg);
     background-image:
     linear-gradient(160deg, rgba(11, 18, 33, 0.35), rgba(11, 18, 33, 0.7)),
-    url('./pic1.png');
+    url('./pic1.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

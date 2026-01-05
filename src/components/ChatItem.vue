@@ -30,7 +30,7 @@ const initials = computed(() => displayName.value?.slice(0, 2)?.toUpperCase() ||
 
 const lastMessagePreview = computed(() => {
   const content = props.chat.last_message?.content;
-  if (!content) return 'No messages yet';
+  if (!content) return ' ';
   return content.length > 32 ? `${content.slice(0, 32)}…` : content;
 });
 

@@ -77,8 +77,10 @@ const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   gap: 0.5rem;
 }
+
 
 .chat-list__header {
   display: flex;
