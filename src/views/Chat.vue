@@ -291,6 +291,7 @@ const handleLogout = () => {
   flex: 1;
   min-height: 0;
   display: flex;
+  flex-direction: column;
 }
 
 .sidebar-list > * {
@@ -302,9 +303,8 @@ const handleLogout = () => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: auto;
   padding-top: 0.25rem;
-  overflow: auto;
+  flex-shrink: 0;
 }
 
 @media (max-width: 1280px) {

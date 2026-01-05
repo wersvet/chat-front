@@ -77,6 +77,7 @@ const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   gap: 0.5rem;
 }
 
@@ -109,6 +110,7 @@ const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
 .chat-list__body {
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   padding: 0 0.35rem 0.65rem;
   display: flex;
   flex-direction: column;
