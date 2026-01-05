@@ -21,10 +21,7 @@ const props = defineProps({
 
 <style scoped>
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -49,7 +46,7 @@ const props = defineProps({
   justify-content: space-between;
   align-items: center;
   padding: 0.4rem 0;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+  border-bottom: 1px dashed var(--border);
 }
 
 .card li:last-child {

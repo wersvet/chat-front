@@ -5,6 +5,9 @@ import router from './router';
 import './assets/main.css';
 import { useAuthStore } from './stores/auth';
 
+const theme = localStorage.getItem('chat-theme') || 'light';
+document.documentElement.setAttribute('data-theme', theme);
+
 const app = createApp(App);
 const pinia = createPinia();
 
