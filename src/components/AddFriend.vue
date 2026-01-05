@@ -31,10 +31,10 @@ const handleSubmit = () => {
 
 <style scoped>
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .stack {
@@ -44,17 +44,19 @@ const handleSubmit = () => {
 }
 
 input {
-  border-radius: 0.9rem;
-  border: 1px solid var(--border-color);
-  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.9rem;
+  background: var(--input-bg);
 }
 
 button.primary {
   border: none;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   color: #fff;
-  border-radius: 999px;
-  padding: 0.55rem 1rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
 }
 </style>

@@ -29,10 +29,7 @@ const emit = defineEmits(['accept', 'reject']);
 
 <style scoped>
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem 1.1rem;
 }
 
 .card ul {
@@ -49,7 +46,7 @@ const emit = defineEmits(['accept', 'reject']);
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+  border-bottom: 1px dashed var(--border);
   padding-bottom: 0.55rem;
 }
 
@@ -65,7 +62,7 @@ const emit = defineEmits(['accept', 'reject']);
 .card__actions button {
   border-radius: 999px;
   padding: 0.35rem 0.9rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   background: transparent;
 }
 

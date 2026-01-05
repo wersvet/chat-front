@@ -50,17 +50,19 @@ const time = computed(() =>
 }
 
 .message-bubble__content {
-  background: #fff;
-  border-radius: 1rem;
-  padding: 0.75rem 1rem;
-  max-width: 70%;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  max-width: 68%;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
   position: relative;
+  border: 1px solid var(--border);
 }
 
 .message-bubble--mine .message-bubble__content {
-  background: linear-gradient(135deg, #6a95ff, #3b64f5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   color: #fff;
+  border-color: transparent;
 }
 
 .message-bubble__content p {
@@ -88,11 +90,16 @@ const time = computed(() =>
 }
 
 .message-bubble__actions button {
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   color: inherit;
-  font-size: 0.7rem;
-  text-decoration: underline;
-  padding: 0;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.message-bubble__actions button:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 </style>
