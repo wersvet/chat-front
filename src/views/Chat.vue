@@ -192,14 +192,14 @@ const handleLogout = () => {
   display: grid;
   grid-template-columns: 380px minmax(0, 1fr);
   gap: 1.35rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .chat-layout__sidebar {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.2rem 1.1rem 1.5rem;
+  gap: 0.75rem;
+  padding: 1.1rem 1rem 1.25rem;
   position: sticky;
   top: 1.2rem;
   height: calc(100vh - 2.4rem);
@@ -233,7 +233,7 @@ const handleLogout = () => {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.6rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -283,7 +283,7 @@ const handleLogout = () => {
 .sidebar-forms {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .sidebar-list {

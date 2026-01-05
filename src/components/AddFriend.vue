@@ -31,22 +31,22 @@ const handleSubmit = () => {
 
 <style scoped>
 .card {
-  padding: 1rem 1.1rem;
+  padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 input {
   border-radius: 10px;
   border: 1px solid var(--border);
-  padding: 0.75rem 0.9rem;
+  padding: 0.65rem 0.85rem;
   background: var(--input-bg);
 }
 
@@ -55,7 +55,7 @@ button.primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   color: #fff;
   border-radius: 10px;
-  padding: 0.7rem 1rem;
+  padding: 0.65rem 0.95rem;
   font-weight: 700;
   box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
 }

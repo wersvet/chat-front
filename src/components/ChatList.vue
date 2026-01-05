@@ -78,15 +78,16 @@ const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .chat-list__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0.85rem 0.35rem;
+  padding: 0.5rem 0.85rem 0.25rem;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .chat-list__header h2 {
@@ -104,7 +105,8 @@ const chatKey = (chat) => `${chat.type || 'private'}-${chat.id}`;
 }
 
 .chat-list__search {
-  padding: 0 0.85rem 0.55rem;
+  padding: 0 0.85rem 0.45rem;
+  flex-shrink: 0;
 }
 
 .chat-list__body {
